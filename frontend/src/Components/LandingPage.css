@@ -1,0 +1,139 @@
+/* LandingPage.css */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(100vh) scale(0);
+  }
+  25% {
+    opacity: 0.3;
+    transform: translateY(75vh) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(50vh) scale(1);
+  }
+  75% {
+    opacity: 0.6;
+    transform: translateY(25vh) scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 1.2s ease-out forwards;
+}
+
+.zoom-container {
+  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform-origin: center center;
+}
+
+.smooth-transition {
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.ultra-smooth {
+  transition: all 0.5s cubic-bezier(0.2, 0.0, 0.2, 1);
+}
+
+.glow-text {
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.morphing-m {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+}
+
+.zoom-particles {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(249, 115, 22, 0.6);
+  border-radius: 50%;
+  animation: particleFloat 3s infinite linear;
+}
+
+.project-tile {
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform-origin: center center;
+}
+
+.project-tile:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.project-tile.active {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.2);
+  width: 80vw;
+  height: 80vh;
+  z-index: 100;
+  background: white;
+  box-shadow: 0 0 40px rgba(0,0,0,0.3);
+}
+
+.project-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.project-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 767px) {
+  .zoom-container {
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  
+  .ultra-smooth {
+    transition: all 0.3s cubic-bezier(0.2, 0.0, 0.2, 1);
+  }
+  
+  .zoom-particles {
+    width: 3px;
+    height: 3px;
+  }
+  
+  .project-tile.active {
+    width: 95vw;
+    height: 95vh;
+  }
+}
+
+/* Prevent text selection on mobile */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
