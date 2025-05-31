@@ -6,6 +6,7 @@ const LandingPage = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [activeProject, setActiveProject] = useState(null);
 
   // Sample projects data
@@ -65,8 +66,9 @@ const LandingPage = () => {
   useEffect(() => {
     const checkDevice = () => {
       const width = window.innerWidth;
-      setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1024);
+      setIsMobile(width < 640);
+      setIsTablet(width >= 640 && width < 1024);
+      setIsDesktop(width >= 1024);
     };
 
     checkDevice();
@@ -96,7 +98,7 @@ const LandingPage = () => {
     const isDownSwipe = distance < -50;
 
     if (isUpSwipe) {
-      setZoomLevel((prev) => Math.min(prev + 0.2, 1.2)); // Changed max to 1.2
+      setZoomLevel((prev) => Math.min(prev + 0.2, 1.2));
     } else if (isDownSwipe) {
       setZoomLevel((prev) => Math.max(prev - 0.2, 0));
     }
@@ -114,7 +116,7 @@ const LandingPage = () => {
       const increment = 0.2;
 
       if (e.deltaY > 0) {
-        setZoomLevel((prev) => Math.min(prev + increment, 1.2)); // Changed max to 1.2
+        setZoomLevel((prev) => Math.min(prev + increment, 1.2));
       } else {
         setZoomLevel((prev) => Math.max(prev - increment, 0));
       }
@@ -123,10 +125,11 @@ const LandingPage = () => {
         setIsScrolling(false);
       }, 50);
     };
+
     const handleKeyDown = (e) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setZoomLevel((prev) => Math.min(prev + 0.2, 1.2)); // Changed max to 1.2
+        setZoomLevel((prev) => Math.min(prev + 0.2, 1.2));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setZoomLevel((prev) => Math.max(prev - 0.2, 0));
@@ -134,6 +137,7 @@ const LandingPage = () => {
         setActiveProject(null);
       }
     };
+
     const preventScroll = (e) => {
       if (isMobile) {
         e.preventDefault();
@@ -171,10 +175,10 @@ const LandingPage = () => {
         zoomTranslateX: zoomLevel * -200,
         zoomTranslateY: zoomLevel * -100,
         mScale: 1 + zoomLevel * 0.6,
-        titleSize: "text-4xl sm:text-5xl",
-        aboutTitleSize: "text-3xl sm:text-4xl",
-        projectsTitleSize: "text-2xl sm:text-3xl",
-        padding: "px-4 sm:px-6",
+        titleSize: "text-4xl",
+        aboutTitleSize: "text-3xl",
+        projectsTitleSize: "text-2xl",
+        padding: "px-4",
         maxBlur: 2,
       };
     } else if (isTablet) {
@@ -183,10 +187,10 @@ const LandingPage = () => {
         zoomTranslateX: zoomLevel * -300,
         zoomTranslateY: zoomLevel * -120,
         mScale: 1 + zoomLevel * 0.7,
-        titleSize: "text-5xl md:text-6xl",
-        aboutTitleSize: "text-4xl md:text-5xl",
-        projectsTitleSize: "text-3xl md:text-4xl",
-        padding: "px-6 md:px-12",
+        titleSize: "text-5xl",
+        aboutTitleSize: "text-4xl",
+        projectsTitleSize: "text-3xl",
+        padding: "px-6",
         maxBlur: 2.5,
       };
     } else {
@@ -211,40 +215,34 @@ const LandingPage = () => {
   const aboutOpacity = zoomLevel >= 0.4 && zoomLevel < 0.6 ? 1 : 0;
   const secondParticlesOpacity = zoomLevel >= 0.6 && zoomLevel < 0.8 ? 1 : 0;
   const projectsOpacity = zoomLevel >= 0.8 && zoomLevel < 1.0 ? 1 : 0;
-  const thirdParticlesOpacity = zoomLevel >= 1.0 && zoomLevel < 1.2 ? 1 : 0; // New range
-  const footerOpacity = zoomLevel >= 1.2 ? 1 : 0; // Moved to 1.2
+  const thirdParticlesOpacity = zoomLevel >= 1.0 && zoomLevel < 1.2 ? 1 : 0;
+  const footerOpacity = zoomLevel >= 1.2 ? 1 : 0;
 
-  const mGlow = zoomLevel * (isMobile ? 60 : 120);
+  const mGlow = zoomLevel * (isMobile ? 60 : isTablet ? 90 : 120);
+
   const getCurrentStage = () => {
-    if (zoomLevel < 0.2) return 1; // Hero
-    if (zoomLevel < 0.4) return 2; // First Particles
-    if (zoomLevel < 0.6) return 3; // About
-    if (zoomLevel < 0.8) return 4; // Second Particles
-    if (zoomLevel < 1.0) return 5; // Projects
-    if (zoomLevel < 1.2) return 6; // Third Particles
-    return 7; // Footer
+    if (zoomLevel < 0.2) return 1;
+    if (zoomLevel < 0.4) return 2;
+    if (zoomLevel < 0.6) return 3;
+    if (zoomLevel < 0.8) return 4;
+    if (zoomLevel < 1.0) return 5;
+    if (zoomLevel < 1.2) return 6;
+    return 7;
   };
+
   const getStageText = () => {
     const stage = getCurrentStage();
     const instructions = isMobile ? "Swipe up" : "Scroll down";
 
     switch (stage) {
-      case 1:
-        return `${instructions} to zoom into M`; // Hero
-      case 2:
-        return "Experience the particles"; // First Particles
-      case 3:
-        return `${instructions} to learn about me`; // About
-      case 4:
-        return "More particles ahead"; // Second Particles
-      case 5:
-        return "Explore my projects"; // Projects
-      case 6:
-        return "Final particle burst"; // Third Particles
-      case 7:
-        return "Connect with me"; // Footer
-      default:
-        return `${instructions} to continue`;
+      case 1: return `${instructions} to zoom into M`;
+      case 2: return "Experience the particles";
+      case 3: return `${instructions} to learn about me`;
+      case 4: return "More particles ahead";
+      case 5: return "Explore my projects";
+      case 6: return "Final particle burst";
+      case 7: return "Connect with me";
+      default: return `${instructions} to continue`;
     }
   };
 
@@ -267,7 +265,7 @@ const LandingPage = () => {
       {/* Floating Particles */}
       {zoomLevel > 0.2 && (
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(isMobile ? 8 : 15)].map((_, i) => (
+          {[...Array(isMobile ? 8 : isTablet ? 12 : 15)].map((_, i) => (
             <div
               key={i}
               className="zoom-particles"
@@ -280,6 +278,7 @@ const LandingPage = () => {
           ))}
         </div>
       )}
+
       {/* First Particle Stage */}
       <div
         className="absolute inset-0 flex items-center justify-center"
@@ -290,7 +289,7 @@ const LandingPage = () => {
         }}
       >
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(isMobile ? 20 : 40)].map((_, i) => (
+          {[...Array(isMobile ? 20 : isTablet ? 30 : 40)].map((_, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 bg-orange-400 rounded-full animate-pulse"
@@ -315,7 +314,7 @@ const LandingPage = () => {
         }}
       >
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(isMobile ? 25 : 50)].map((_, i) => (
+          {[...Array(isMobile ? 25 : isTablet ? 35 : 50)].map((_, i) => (
             <div
               key={i}
               className="absolute bg-orange-300 rounded-full animate-ping"
@@ -331,6 +330,8 @@ const LandingPage = () => {
           ))}
         </div>
       </div>
+
+      {/* Third Particle Stage */}
       <div
         className="absolute inset-0 flex items-center justify-center"
         style={{
@@ -340,7 +341,7 @@ const LandingPage = () => {
         }}
       >
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(isMobile ? 30 : 60)].map((_, i) => (
+          {[...Array(isMobile ? 30 : isTablet ? 45 : 60)].map((_, i) => (
             <div
               key={i}
               className="absolute bg-orange-400 rounded-full animate-bounce"
@@ -356,6 +357,7 @@ const LandingPage = () => {
           ))}
         </div>
       </div>
+
       {/* Project Overlay */}
       <div className={`project-overlay ${activeProject ? "active" : ""}`} />
 
@@ -383,7 +385,7 @@ const LandingPage = () => {
             })`,
           }}
         >
-          <div className="max-w-6xl fade-in-up">
+          <div className="max-w-6xl mx-auto fade-in-up">
             <div
               className="text-gray-400 text-xs sm:text-sm mb-2 sm:mb-4 tracking-wider ultra-smooth"
               style={{
@@ -409,14 +411,14 @@ const LandingPage = () => {
                     isMobile
                       ? "top-8 right-8 text-4xl"
                       : "top-20 right-20 text-9xl"
-                  } font-bold text-orange-200 pointer-events-none select-none ultra-smooth opacity-10`} // Changed opacity-10 to opacity-20
+                  } font-bold text-orange-200 pointer-events-none select-none ultra-smooth opacity-20`}
                   style={{
-                    opacity: Math.max(0, 0.2 - zoomLevel * 0.3), // Changed from 0.1 to 0.2
+                    opacity: Math.max(0, 0.2 - zoomLevel * 0.3),
                     transform: `scale(${1 + zoomLevel * 2}) rotate(${
                       zoomLevel * 20
                     }deg)`,
-                    color: "#f97316", // Added orange color directly
-                    textShadow: "0 0 20px rgba(249, 115, 22, 0.3)", // Added glow
+                    color: "#f97316",
+                    textShadow: "0 0 20px rgba(249, 115, 22, 0.3)",
                   }}
                 >
                   P
@@ -500,7 +502,7 @@ const LandingPage = () => {
           filter: `blur(${Math.max(0, (1 - aboutOpacity) * 2)}px)`,
         }}
       >
-        <div className="max-w-6xl w-full">
+        <div className="max-w-6xl w-full mx-auto">
           <div
             className="text-orange-500 text-xs sm:text-sm mb-1 sm:mb-2 tracking-wider font-semibold ultra-smooth"
             style={{
@@ -549,7 +551,7 @@ const LandingPage = () => {
                     className="morphing-m glow-text"
                     style={{
                       textShadow: `0 0 ${
-                        aboutOpacity * (isMobile ? 15 : 30)
+                        aboutOpacity * (isMobile ? 15 : isTablet ? 20 : 30)
                       }px rgba(249, 115, 22, 0.6)`,
                       color: aboutOpacity > 0.5 ? "#f97316" : "#1f2937",
                     }}
@@ -665,23 +667,23 @@ const LandingPage = () => {
 
       {/* Projects Section */}
       <section
-  className={`absolute inset-0 flex flex-col justify-center ${responsive.padding} ultra-smooth no-select`}
-  style={{
-    opacity: projectsOpacity,
-    background: `
-      radial-gradient(circle at center, rgba(249, 115, 22, ${
-        projectsOpacity * 0.03
-      }), transparent 70%),
-      linear-gradient(135deg, #ffffff, #f8fafc)
-    `,
-    transform: `scale(${0.85 + projectsOpacity * 0.15}) translate(${
-      (1 - projectsOpacity) * 100
-    }px, ${(1 - projectsOpacity) * 50}px)`,
-    filter: `blur(${Math.max(0, (1 - projectsOpacity) * 2)}px)`,
-    pointerEvents: projectsOpacity > 0 ? 'auto' : 'none', // Add this line
-  }}
->
-        <div className="max-w-6xl w-full">
+        className={`absolute inset-0 flex flex-col justify-center ${responsive.padding} ultra-smooth no-select`}
+        style={{
+          opacity: projectsOpacity,
+          background: `
+            radial-gradient(circle at center, rgba(249, 115, 22, ${
+              projectsOpacity * 0.03
+            }), transparent 70%),
+            linear-gradient(135deg, #ffffff, #f8fafc)
+          `,
+          transform: `scale(${0.85 + projectsOpacity * 0.15}) translate(${
+            (1 - projectsOpacity) * 100
+          }px, ${(1 - projectsOpacity) * 50}px)`,
+          filter: `blur(${Math.max(0, (1 - projectsOpacity) * 2)}px)`,
+          pointerEvents: projectsOpacity > 0 ? 'auto' : 'none',
+        }}
+      >
+        <div className="max-w-6xl w-full mx-auto">
           <div
             className="text-orange-500 text-xs sm:text-sm mb-1 sm:mb-2 tracking-wider font-semibold ultra-smooth"
             style={{
@@ -730,7 +732,7 @@ const LandingPage = () => {
                     className="morphing-m glow-text"
                     style={{
                       textShadow: `0 0 ${
-                        projectsOpacity * (isMobile ? 15 : 30)
+                        projectsOpacity * (isMobile ? 15 : isTablet ? 20 : 30)
                       }px rgba(249, 115, 22, 0.6)`,
                       color: projectsOpacity > 0.5 ? "#f97316" : "#1f2937",
                     }}
@@ -755,7 +757,11 @@ const LandingPage = () => {
                     key={project.id}
                     className={`project-tile ${
                       activeProject === project.id ? "active" : ""
-                    } ${project.color} p-6 rounded-xl cursor-pointer`}
+                    } ${project.color} p-6 rounded-xl cursor-pointer transition-all duration-300 ${
+                      activeProject && activeProject !== project.id
+                        ? "opacity-50 scale-95"
+                        : "hover:scale-105"
+                    }`}
                     onClick={() => handleProjectClick(project.id)}
                   >
                     <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
@@ -800,81 +806,83 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-{footerOpacity > 0 && (
-  <section 
-    className={`absolute inset-0 flex flex-col justify-center ${responsive.padding} ultra-smooth no-select`}
-    style={{ 
-      opacity: footerOpacity,
-      background: `
-        radial-gradient(circle at center, rgba(249, 115, 22, ${footerOpacity * 0.05}), transparent 70%),
-        linear-gradient(135deg, #111827, #1f2937)
-      `,
-      transform: `scale(${0.85 + footerOpacity * 0.15}) translate(${(1 - footerOpacity) * 120}px, ${(1 - footerOpacity) * 60}px)`,
-      filter: `blur(${Math.max(0, (1 - footerOpacity) * 2)}px)`,
-    }}
-  >
-        <div className="max-w-6xl w-full">
-          <div
-            className="text-orange-500 text-xs sm:text-sm mb-1 sm:mb-2 tracking-wider font-semibold ultra-smooth"
-            style={{
-              opacity: footerOpacity,
-              transform: `translateY(${(1 - footerOpacity) * 15}px)`,
-            }}
-          >
-            Connect
-          </div>
-          <div className="flex">
+
+      {/* Footer/Contact Section */}
+      {footerOpacity > 0 && (
+        <section 
+          className={`absolute inset-0 flex flex-col justify-center ${responsive.padding} ultra-smooth no-select`}
+          style={{ 
+            opacity: footerOpacity,
+            background: `
+              radial-gradient(circle at center, rgba(249, 115, 22, ${footerOpacity * 0.05}), transparent 70%),
+              linear-gradient(135deg, #111827, #1f2937)
+            `,
+            transform: `scale(${0.85 + footerOpacity * 0.15}) translate(${(1 - footerOpacity) * 120}px, ${(1 - footerOpacity) * 60}px)`,
+            filter: `blur(${Math.max(0, (1 - footerOpacity) * 2)}px)`,
+          }}
+        >
+          <div className="max-w-6xl w-full mx-auto">
             <div
-              className={`w-px bg-gradient-to-b from-orange-500 to-gray-300 ${
-                isMobile ? "h-48" : isTablet ? "h-64" : "h-80"
-              } mr-4 sm:mr-8 ultra-smooth`}
+              className="text-orange-500 text-xs sm:text-sm mb-1 sm:mb-2 tracking-wider font-semibold ultra-smooth"
               style={{
                 opacity: footerOpacity,
-                transform: `scaleY(${footerOpacity})`,
+                transform: `translateY(${(1 - footerOpacity) * 15}px)`,
               }}
-            />
-            <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 w-full">
-              <div className="relative">
-                <div
-                  className={`absolute ${
-                    isMobile
-                      ? "-top-2 -left-8 text-4xl"
-                      : "-top-4 -left-16 text-8xl"
-                  } font-bold text-orange-100 pointer-events-none select-none ultra-smooth`}
-                  style={{
-                    opacity: footerOpacity * 0.25,
-                    transform: `scale(${0.3 + footerOpacity * 0.7}) rotate(${
-                      footerOpacity * 10
-                    }deg) translateY(${(1 - footerOpacity) * 25}px)`,
-                  }}
-                >
-                  C
-                </div>
-                <h1
-                  className={`${responsive.projectsTitleSize} font-bold text-white relative z-10 ultra-smooth`}
-                  style={{
-                    opacity: footerOpacity,
-                    transform: `translateY(${(1 - footerOpacity) * 30}px)`,
-                  }}
-                >
-                  <span
-                    className="morphing-m glow-text"
+            >
+              Connect
+            </div>
+            <div className="flex">
+              <div
+                className={`w-px bg-gradient-to-b from-orange-500 to-gray-300 ${
+                  isMobile ? "h-48" : isTablet ? "h-64" : "h-80"
+                } mr-4 sm:mr-8 ultra-smooth`}
+                style={{
+                  opacity: footerOpacity,
+                  transform: `scaleY(${footerOpacity})`,
+                }}
+              />
+              <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 w-full">
+                <div className="relative">
+                  <div
+                    className={`absolute ${
+                      isMobile
+                        ? "-top-2 -left-8 text-4xl"
+                        : "-top-4 -left-16 text-8xl"
+                    } font-bold text-orange-100 pointer-events-none select-none ultra-smooth`}
                     style={{
-                      textShadow: `0 0 ${
-                        footerOpacity * (isMobile ? 15 : 30)
-                      }px rgba(249, 115, 22, 0.6)`,
-                      color: footerOpacity > 0.5 ? "#f97316" : "#ffffff",
+                      opacity: footerOpacity * 0.25,
+                      transform: `scale(${0.3 + footerOpacity * 0.7}) rotate(${
+                        footerOpacity * 10
+                      }deg) translateY(${(1 - footerOpacity) * 25}px)`,
                     }}
                   >
                     C
-                  </span>
-                  onnect With Me
-                </h1>
-              </div>
+                  </div>
+                  <h1
+                    className={`${responsive.projectsTitleSize} font-bold text-white relative z-10 ultra-smooth`}
+                    style={{
+                      opacity: footerOpacity,
+                      transform: `translateY(${(1 - footerOpacity) * 30}px)`,
+                    }}
+                  >
+                    <span
+                      className="morphing-m glow-text"
+                      style={{
+                        textShadow: `0 0 ${
+                          footerOpacity * (isMobile ? 15 : isTablet ? 20 : 30)
+                        }px rgba(249, 115, 22, 0.6)`,
+                        color: footerOpacity > 0.5 ? "#f97316" : "#ffffff",
+                      }}
+                    >
+                      C
+                    </span>
+                    onnect With Me
+                  </h1>
+                </div>
 
-              <p
-                className="text-gray-300 text-sm sm:text-base lg:text-lg max-w-3xl leading-relaxed ultra-smooth"
-                style={{
+                <p
+                  className="text-gray-300 text-sm sm:text-base lg:text-lg max-w-3xl leading-relaxed ultra-smooth"
+                  style={{
                   opacity: Math.min(footerOpacity * 1.3, 1),
                   transform: `translateY(${(1 - footerOpacity) * 35}px)`,
                 }}
